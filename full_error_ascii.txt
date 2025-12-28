@@ -1,0 +1,61 @@
+node.exe : Prisma schema 
+loaded from 
+prisma\schema.prisma.
+En l?nea: 1 Car?cter: 1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (Prisma   
+  schema l...\schema.prism   
+ a.:String) [], RemoteExc    
+eption
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+
+Error: Prisma schema 
+validation - (validate wasm)
+Error code: P1012
+[1;91merror[0m: [1mError 
+validating: This line is 
+invalid. It does not start 
+with any known Prisma schema 
+keyword.[0m
+  [1;94m-->[0m  [4mprisma\
+schema.prisma:1[0m
+[1;94m   | [0m
+[1;94m   | [0m
+[1;94m 1 | 
+[0m[1;91mgenerator client 
+{ provider = 
+"prisma-client-js" } 
+datasource db { provider = 
+"sqlite" url = 
+"file:./dev.db" } model 
+Expense { id String @id 
+@default(cuid()) description 
+String amount Float date 
+DateTime @default(now()) 
+category String createdAt 
+DateTime @default(now()) 
+updatedAt DateTime 
+@updatedAt } model Category 
+{ id String @id 
+@default(cuid()) name String 
+@unique color String 
+@default("#6366f1") icon 
+String @default("Hash") }
+[0m
+[1;94m 2 | [0m
+[1;94m   | [0m
+
+Validation Error Count: 1
+[Context: validate]
+
+Prisma CLI Version : 7.2.0
+
