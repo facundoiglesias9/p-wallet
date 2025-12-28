@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
-import { SavingForm } from './SavingForm';
+import { SavingForm } from '@/components/features/savings/SavingForm';
 
 interface AddSavingButtonProps {
     currency: string;

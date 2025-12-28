@@ -13,8 +13,8 @@ import {
     AlertTriangle,
     Users
 } from 'lucide-react';
-import { deleteExpense, updateExpense } from '@/app/actions';
-import { MonthSelector } from './MonthSelector';
+import { deleteExpense, updateExpense } from '@/actions/expenses';
+import { MonthSelector } from '@/components/ui/MonthSelector';
 
 interface Category {
     id: string;

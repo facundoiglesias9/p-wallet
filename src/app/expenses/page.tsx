@@ -3,12 +3,12 @@ import {
     Filter,
     FileSpreadsheet
 } from 'lucide-react';
-import { MonthPicker } from '@/components/MonthPicker';
+import { MonthPicker } from '@/components/ui/MonthPicker';
 import prisma from '@/lib/prisma';
-import { getExpenses, getCategories } from '../actions';
-import { ExpenseForm } from './ExpenseForm';
-import { ExpenseItem } from '@/components/ExpenseItem';
-import { getPeople } from '../settings/actions';
+import { getExpenses, getCategories } from '@/actions/expenses';
+import { ExpenseForm } from '@/components/features/expenses/ExpenseForm';
+import { ExpenseItem } from '@/components/features/expenses/ExpenseItem';
+import { getPeople } from '@/actions/settings';
 
 export default async function ExpensesPage({
     searchParams,

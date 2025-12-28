@@ -1,18 +1,17 @@
 'use client';
 
 import { useState, useActionState } from 'react';
-import { register } from './actions';
-import { ArrowRight, UserPlus, Eye, EyeOff } from 'lucide-react';
+import { login } from '../../../actions/auth';
+import { ArrowRight, Wallet, Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
 
 const initialState = {
     error: '',
 };
 
-export function RegisterForm() {
-    const [state, formAction, isPending] = useActionState(register, initialState);
+export function LoginForm() {
+    const [state, formAction, isPending] = useActionState(login, initialState);
     const [showPassword, setShowPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     return (
         <form action={formAction} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', textAlign: 'left' }}>
@@ -20,7 +19,7 @@ export function RegisterForm() {
                 <input
                     name="username"
                     type="text"
-                    placeholder="Elige tu Usuario"
+                    placeholder="Usuario"
                     className="input-premium"
                     required
                     style={{ width: '100%', padding: '1rem' }}
@@ -52,34 +51,6 @@ export function RegisterForm() {
                     }}
                 >
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                </button>
-            </div>
-            <div style={{ position: 'relative' }}>
-                <input
-                    name="confirmPassword"
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    placeholder="Confirmar Contraseña"
-                    className="input-premium"
-                    required
-                    style={{ width: '100%', padding: '1rem', paddingRight: '3rem' }}
-                />
-                <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    style={{
-                        position: 'absolute',
-                        right: '1rem',
-                        top: '50%',
-                        transform: 'translateY(-50%)',
-                        background: 'none',
-                        border: 'none',
-                        color: 'var(--text-dim)',
-                        cursor: 'pointer',
-                        padding: 0,
-                        display: 'flex'
-                    }}
-                >
-                    {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
             </div>
 
@@ -117,15 +88,15 @@ export function RegisterForm() {
                     transition: 'transform 0.2s'
                 }}
             >
-                {isPending ? 'Creando cuenta...' : 'Crear Cuenta'}
-                {!isPending && <UserPlus size={20} />}
+                {isPending ? 'Ingresando...' : 'Ingresar'}
+                {!isPending && <ArrowRight size={20} />}
             </button>
 
             <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
                 <p style={{ fontSize: '0.9rem', color: 'var(--text-dim)' }}>
-                    ¿Ya tienes cuenta?{' '}
-                    <Link href="/login" style={{ color: 'var(--primary)', fontWeight: 600, textDecoration: 'none' }}>
-                        Inicia Sesión
+                    ¿No tienes cuenta?{' '}
+                    <Link href="/register" style={{ color: 'var(--primary)', fontWeight: 600, textDecoration: 'none' }}>
+                        Regístrate aquí
                     </Link>
                 </p>
             </div>

@@ -1,9 +1,9 @@
-import { getPeople, createPerson, deletePerson, getAllAccounts, deleteAccount } from './actions';
+import { getPeople, createPerson, deletePerson, getAllAccounts, deleteAccount } from '@/actions/settings';
 import { verifySession } from '@/lib/session';
 import { Settings, Users, ArrowLeft, Trash2, Plus, Shield } from 'lucide-react';
 import Link from 'next/link';
 
-import { DeleteAccountButton } from './DeleteAccountButton';
+import { DeleteAccountButton } from '@/components/features/auth/DeleteAccountButton';
 
 export default async function SettingsPage() {
     const people = await getPeople();

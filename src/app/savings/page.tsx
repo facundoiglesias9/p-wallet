@@ -1,7 +1,7 @@
 import { Trash2, PiggyBank, TrendingUp } from 'lucide-react';
-import { getSavings, deleteSaving } from '../savings_actions';
-import { AddSavingButton } from './AddSavingButton';
-import { MonthPicker } from '@/components/MonthPicker';
+import { getSavings, deleteSaving } from '@/actions/savings';
+import { AddSavingButton } from '@/components/features/savings/AddSavingButton';
+import { MonthPicker } from '@/components/ui/MonthPicker';
 
 export default async function SavingsPage({
     searchParams,

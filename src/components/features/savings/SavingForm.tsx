@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Sparkles } from 'lucide-react';
-import { createSaving } from '../savings_actions';
-import { MonthSelector } from '@/components/MonthSelector';
+import { createSaving } from '@/actions/savings';
+import { MonthSelector } from '@/components/ui/MonthSelector';
 
 interface SavingFormProps {
     initialAmount?: number;

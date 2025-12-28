@@ -14,8 +14,8 @@ import {
     Zap, Bus, Shirt, Music, Plane, GraduationCap, CreditCard, Banknote, Coins
 } from 'lucide-react';
 import prisma from '@/lib/prisma';
-import { CategoryForm } from './CategoryForm';
-import { CategoryItem } from '@/components/CategoryItem';
+import { CategoryForm } from '@/components/features/categories/CategoryForm';
+import { CategoryItem } from '@/components/features/categories/CategoryItem';
 
 import { verifySession } from '@/lib/session';
 

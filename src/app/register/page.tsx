@@ -1,4 +1,4 @@
-import { RegisterForm } from './RegisterForm';
+import { RegisterForm } from '@/components/features/auth/RegisterForm';
 import { UserPlus } from 'lucide-react';
 
 export default function RegisterPage() {

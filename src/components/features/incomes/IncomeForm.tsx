@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { X, Plus, Sparkles, Calendar, Wallet, Banknote } from 'lucide-react';
-import { createIncome } from '../income_actions';
-import { MonthSelector } from '@/components/MonthSelector';
+import { createIncome } from '@/actions/incomes';
+import { MonthSelector } from '@/components/ui/MonthSelector';
 
 export function IncomeForm({ people = [], currentUserName = 'Yo' }: { people?: any[], currentUserName?: string }) {
     const [isOpen, setIsOpen] = useState(false);

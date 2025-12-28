@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Target, Pencil, Check, X, PlusCircle } from 'lucide-react';
-import { SavingForm } from '@/app/savings/SavingForm';
+import { SavingForm } from './SavingForm';
 
 interface SavingsGoalWidgetProps {
     currentSavings: number;

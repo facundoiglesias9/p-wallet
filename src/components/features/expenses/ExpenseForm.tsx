@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { X, Sparkles, CreditCard, RefreshCw, Calendar, Plus, Users } from 'lucide-react';
-import { createExpense } from '../actions';
-import { MonthSelector } from '@/components/MonthSelector';
+import { createExpense } from '@/actions/expenses';
+import { MonthSelector } from '@/components/ui/MonthSelector';
 
 interface Category {
     id: string;

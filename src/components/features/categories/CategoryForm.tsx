@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Plus, Sparkles, Utensils, Car, Tv, Home, ShoppingBag, Heart, Gamepad2, Coffee, Zap, Bus, Shirt, Music, Plane, GraduationCap, CreditCard } from 'lucide-react';
-import { createCategory } from '../actions'; // We might need to make sure this action exists
+import { createCategory } from '@/actions/expenses'; // Category actions merged into expenses for now
 
 const ICONS = [
     { name: 'Utensils', icon: Utensils },

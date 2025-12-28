@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { logout } from '@/app/login/actions';
+import { logout } from '@/actions/auth';
 
 export function Sidebar() {
     const pathname = usePathname();

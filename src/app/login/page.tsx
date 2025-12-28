@@ -1,4 +1,4 @@
-import { LoginForm } from './LoginForm';
+import { LoginForm } from '@/components/features/auth/LoginForm';
 import { Wallet } from 'lucide-react';
 
 export default function LoginPage() {

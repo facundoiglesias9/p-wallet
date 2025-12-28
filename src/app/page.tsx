@@ -1,10 +1,10 @@
 import { ArrowUpCircle, ArrowDownCircle, Banknote, Target, PieChart, RefreshCw, CreditCard, Users } from 'lucide-react';
 import prisma from '@/lib/prisma';
-import { MonthPicker } from '@/components/MonthPicker';
-import { getIncomes } from './income_actions';
-import { SavingsGoalWidget } from '@/components/SavingsGoalWidget';
+import { MonthPicker } from '@/components/ui/MonthPicker';
+import { getIncomes } from '@/actions/incomes';
+import { SavingsGoalWidget } from '@/components/features/savings/SavingsGoalWidget';
 import { verifySession } from '@/lib/session';
-import { getPeople } from './settings/actions';
+import { getPeople } from '@/actions/settings';
 
 export default async function Dashboard({
   searchParams,

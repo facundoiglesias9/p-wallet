@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Trash2, AlertTriangle, X, Check } from 'lucide-react';
-import { deleteAccount } from './actions';
+import { deleteAccount } from '@/actions/settings';
 import { createPortal } from 'react-dom';
 
 export function DeleteAccountButton({ userId }: { userId: string }) {

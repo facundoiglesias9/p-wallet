@@ -1,6 +1,6 @@
-import { getSharedData } from './actions';
+import { getSharedData } from '@/actions/shared';
 import { Users, User, ArrowRight, Home, DollarSign, Wallet } from 'lucide-react';
-import { MonthPicker } from '@/components/MonthPicker';
+import { MonthPicker } from '@/components/ui/MonthPicker';
 
 export default async function SharedPage({
     searchParams,

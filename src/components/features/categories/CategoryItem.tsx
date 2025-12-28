@@ -10,7 +10,7 @@ import {
     AlertTriangle,
     Utensils, Car, Tv, Home, ShoppingBag, Heart, Gamepad2, Coffee, Zap, Bus, Shirt, Music, Plane, GraduationCap, CreditCard, Banknote, Coins
 } from 'lucide-react';
-import { updateCategory, deleteCategory } from '@/app/actions';
+import { updateCategory, deleteCategory } from '@/actions/expenses';
 
 const ICONS = [
     { name: 'Utensils', icon: Utensils },

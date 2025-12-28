@@ -12,8 +12,8 @@ import {
     AlertTriangle,
     Calendar
 } from 'lucide-react';
-import { deleteIncome, updateIncome } from '@/app/income_actions';
-import { MonthSelector } from './MonthSelector';
+import { deleteIncome, updateIncome } from '@/actions/incomes';
+import { MonthSelector } from '@/components/ui/MonthSelector';
 
 interface IncomeItemProps {
     income: {

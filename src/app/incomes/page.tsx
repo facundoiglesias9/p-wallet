@@ -1,8 +1,8 @@
 import { FileSpreadsheet } from 'lucide-react';
-import { getIncomes } from '../income_actions';
-import { IncomeForm } from './IncomeForm';
-import { IncomeItem } from '@/components/IncomeItem';
-import { MonthPicker } from '@/components/MonthPicker';
+import { getIncomes } from '@/actions/incomes';
+import { IncomeForm } from '@/components/features/incomes/IncomeForm';
+import { IncomeItem } from '@/components/features/incomes/IncomeItem';
+import { MonthPicker } from '@/components/ui/MonthPicker';
 import prisma from '@/lib/prisma';
 import { verifySession } from '@/lib/session';
 

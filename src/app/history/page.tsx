@@ -1,6 +1,6 @@
 import { Search, Filter, ArrowUpCircle, ArrowDownCircle, Download, Calendar } from 'lucide-react';
-import { getExpenses } from '../actions';
-import { getIncomes } from '../income_actions';
+import { getExpenses } from '@/actions/expenses';
+import { getIncomes } from '@/actions/incomes';
 
 export default async function HistoryPage() {
     const expenses = await getExpenses();

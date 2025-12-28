@@ -1,7 +1,7 @@
-import { getExpenses, getCategories } from '../actions';
-import { MonthPicker } from '@/components/MonthPicker';
+import { getExpenses, getCategories } from '@/actions/expenses';
+import { MonthPicker } from '@/components/ui/MonthPicker';
 import { CheckCircle2, Circle, Layers } from 'lucide-react';
-import { toggleCategoryPaid } from './actions';
+import { toggleCategoryPaid } from '@/actions/payments';
 import prisma from '@/lib/prisma';
 import { verifySession } from '@/lib/session';
 
