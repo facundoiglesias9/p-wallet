@@ -29,7 +29,8 @@ export default async function IncomesPage() {
     ` as any[] : [];
 
     const userRec = userId ? await prisma.$queryRaw`SELECT username FROM "User" WHERE id = ${userId}` as any[] : [];
-    const currentUserName = userRec[0]?.username || 'Yo';
+    const dbName = userRec[0]?.username;
+    const currentUserName = (dbName && !dbName.startsWith('user_')) ? dbName : 'Yo';
 
     return (
         <div style={{ maxWidth: '1000px', margin: '0 auto', paddingBottom: '4rem' }}>

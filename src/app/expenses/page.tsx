@@ -24,7 +24,8 @@ export default async function ExpensesPage() {
     const session = await (await import('@/lib/session')).verifySession();
     const userId = session?.userId as string;
     const userRec = userId ? await prisma.$queryRaw`SELECT username FROM "User" WHERE id = ${userId}` as any[] : []; // Added quotes for Postgres safety
-    const currentUserName = userRec[0]?.username || 'Yo';
+    const dbName = userRec[0]?.username;
+    const currentUserName = (dbName && !dbName.startsWith('user_')) ? dbName : 'Yo';
 
     // Serializamos las fechas para evitar advertencias de "Date object" en props de Client Component
     const expenses = expensesRaw.map((e: any) => ({

@@ -234,8 +234,11 @@ export async function getSharedData(month?: number, year?: number) {
             }));
 
         // Fetch current user name
-        const userRec = await prisma.$queryRaw`SELECT username FROM User WHERE id = ${userId}` as any[];
-        const currentUserName = userRec[0]?.username || 'Yo';
+        // Fetch current user name
+        const userRec = await prisma.$queryRaw`SELECT username FROM "User" WHERE id = ${userId}` as any[];
+        const dbName = userRec[0]?.username;
+        // If dbName is the generated ID (starts with user_), fallback to 'Yo'
+        const currentUserName = (dbName && !dbName.startsWith('user_')) ? dbName : 'Yo';
 
         return {
             oneTimePeople,
