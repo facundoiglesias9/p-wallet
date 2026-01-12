@@ -1,29 +1,27 @@
 'use client';
 
 import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+import { useTransition } from 'react';
+import { setDateFilter } from '@/actions/app-settings';
 
-export function MonthPicker() {
+interface MonthPickerProps {
+    initialMonth: number;
+    initialYear: number;
+}
+
+export function MonthPicker({ initialMonth, initialYear }: MonthPickerProps) {
     const router = useRouter();
-    const searchParams = useSearchParams();
-
-    const currentMonth = searchParams.get('month')
-        ? parseInt(searchParams.get('month')!)
-        : 0; // Default January
-
-    const currentYear = searchParams.get('year')
-        ? parseInt(searchParams.get('year')!)
-        : 2026; // Default 2026
+    const [isPending, startTransition] = useTransition();
 
     const months = [
         "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
         "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
     ];
 
-    const changeMonth = useCallback((direction: number) => {
-        let newMonth = currentMonth + direction;
-        let newYear = currentYear;
+    const changeMonth = (direction: number) => {
+        let newMonth = initialMonth + direction;
+        let newYear = initialYear;
 
         if (newMonth > 11) {
             newMonth = 0;
@@ -33,17 +31,13 @@ export function MonthPicker() {
             newYear -= 1;
         }
 
-        // Bloquear fechas anteriores a Enero 2026
-        if (newYear < 2026) return;
-
-        const params = new URLSearchParams(searchParams.toString());
-        params.set('month', newMonth.toString());
-        params.set('year', newYear.toString());
-
-        // Use the current pathname to stay on the same page (Expenses, Incomes, etc.)
-        const pathname = window.location.pathname;
-        router.push(`${pathname}?${params.toString()}`);
-    }, [currentMonth, currentYear, router, searchParams]);
+        startTransition(async () => {
+            // 1. Guardar en cookie (Servidor)
+            await setDateFilter(newMonth, newYear);
+            // 2. Refrescar la página actual (Servidor renderizará con nueva cookie)
+            router.refresh();
+        });
+    };
 
     return (
         <div style={{
@@ -55,7 +49,10 @@ export function MonthPicker() {
             borderRadius: '24px',
             border: '1px solid var(--border)',
             backdropFilter: 'blur(10px)',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)'
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+            opacity: isPending ? 0.7 : 1,
+            pointerEvents: isPending ? 'none' : 'auto',
+            transition: 'opacity 0.2s'
         }}>
             <button
                 onClick={() => changeMonth(-1)}
@@ -79,7 +76,7 @@ export function MonthPicker() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', minWidth: '180px', justifyContent: 'center' }}>
                 <Calendar size={20} color="var(--primary)" />
                 <h2 style={{ fontSize: '1.25rem', fontWeight: 700, letterSpacing: '0.5px', color: 'var(--text-main)' }}>
-                    {months[currentMonth]} {currentYear}
+                    {months[initialMonth]} {initialYear}
                 </h2>
             </div>
 

@@ -1,42 +1,41 @@
 import 'server-only';
-import { SignJWT, jwtVerify } from 'jose';
-import { cookies } from 'next/headers';
+import { auth } from '@clerk/nextjs/server';
+import prisma from '@/lib/prisma';
 
-const secretKey = 'secret-key-facundo-app';
-const encodedKey = new TextEncoder().encode(secretKey);
+export async function verifySession() {
+    const { userId } = await auth();
 
+    if (!userId) {
+        return null;
+    }
+
+    // Opcional: Asegurar que el usuario existe en nuestra DB local para mantener integridad referencial
+    // Esto es útil si tienes relaciones Foreign Key estrictas con la tabla User
+    try {
+        await prisma.user.upsert({
+            where: { id: userId },
+            update: {}, // No actualizar nada si ya existe
+            create: {
+                id: userId,
+                // Como Clerk maneja la auth, usamos el ID como username temporal si es un usuario nuevo
+                username: `user_${userId}`, // Usamos ID completo para evitar colisiones
+                password: 'placeholder', // Placeholder, no se usa
+            }
+        });
+    } catch (error) {
+        console.error("Error sincronizando usuario Clerk con Prisma:", error);
+        // Continuamos igual, esperando que no explote si la FK es opcional
+    }
+
+    return { userId };
+}
+
+// Funciones obsoletas mantenidas para evitar romper imports, pero ya no hacen nada
+// La gestión de sesión ahora es 100% de Clerk
 export async function createSession(userId: string) {
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
-    const session = await new SignJWT({ userId, expiresAt })
-        .setProtectedHeader({ alg: 'HS256' })
-        .setIssuedAt()
-        .setExpirationTime('7d')
-        .sign(encodedKey);
-
-    (await cookies()).set('session', session, {
-        httpOnly: true,
-        secure: true,
-        expires: expiresAt,
-        sameSite: 'lax',
-        path: '/',
-    });
+    // No-op
 }
 
 export async function deleteSession() {
-    (await cookies()).delete('session');
-}
-
-export async function verifySession() {
-    const cookie = (await cookies()).get('session')?.value;
-    if (!cookie) return null;
-
-    try {
-        const { payload } = await jwtVerify(cookie, encodedKey, {
-            algorithms: ['HS256'],
-        });
-        return payload;
-    } catch (e) {
-        // console.error('Failed to verify session');
-        return null;
-    }
+    // No-op
 }

@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -19,6 +19,7 @@ model User {
   categoryPayments CategoryPayment[]
   savings          Saving[]
   RecurringIncome  RecurringIncome[]
+  plans            ExpensePlan[]
 }
 
 model Expense {
@@ -118,4 +119,19 @@ model Person {
   userId    String?
   incomes   Income[]
   recurringIncomes RecurringIncome[]
+}
+
+model ExpensePlan {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  amount      Float
+  link        String?
+  installments Int     @default(1)
+  isPurchased Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User?    @relation(fields: [userId], references: [id])
+  userId      String?
 }

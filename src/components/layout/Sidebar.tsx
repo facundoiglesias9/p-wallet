@@ -1,81 +1,81 @@
 'use client';
-import {
-    Wallet,
-    Settings,
-    LogOut,
-    History,
-    LayoutDashboard,
-    CreditCard,
-    LayoutGrid,
-    PiggyBank,
-    CheckCircle2,
-    Users
-} from 'lucide-react';
+
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { logout } from '@/actions/auth';
+import { LayoutDashboard, CreditCard, Banknote, Target, Settings, Wallet, CheckCircle2, Users } from 'lucide-react';
+import { UserButton, useUser } from "@clerk/nextjs";
+
+const menuItems = [
+    { name: 'Dashboard', icon: LayoutDashboard, href: '/dashboard' },
+    { name: 'Gastos', icon: CreditCard, href: '/expenses' },
+    { name: 'Pagos Mensuales', icon: CheckCircle2, href: '/payments' },
+    { name: 'Ingresos', icon: Banknote, href: '/incomes' },
+    { name: 'Planes de Gastos', icon: Target, href: '/plans' },
+    { name: 'Compartidos', icon: Users, href: '/shared' },
+    { name: 'Configuración', icon: Settings, href: '/settings' },
+];
 
 export function Sidebar() {
     const pathname = usePathname();
-
-    if (pathname === '/login') return null;
-
-    const menuItems = [
-        { name: 'Dashboard', icon: LayoutDashboard, href: '/' },
-        { name: 'Gastos', icon: CreditCard, href: '/expenses' },
-        { name: 'Pagos Mensuales', icon: CheckCircle2, href: '/payments' },
-        { name: 'Saldos', icon: Users, href: '/shared' },
-        { name: 'Ingresos', icon: Wallet, href: '/incomes' },
-        { name: 'Categorías', icon: LayoutGrid, href: '/categories' },
-        { name: 'Ahorros', icon: PiggyBank, href: '/savings' },
-        { name: 'Historial', icon: History, href: '/history' },
-    ];
+    const { user, isLoaded } = useUser();
 
     return (
         <aside className="sidebar">
-            <div className="sidebar-logo">
-                <Wallet size={32} strokeWidth={2.5} style={{ color: 'var(--primary)' }} />
-                <span>P-Wallet</span>
+            <div className="sidebar-header">
+                <div className="logo-container">
+                    <Wallet size={32} className="text-primary" />
+                </div>
+                <h1 className="app-title">
+                    P-Wallet
+                </h1>
             </div>
 
-            <nav style={{ flex: 1 }}>
-                <ul className="nav-list">
-                    {menuItems.map((item) => {
-                        const isActive = pathname === item.href;
-                        return (
-                            <li key={item.href}>
-                                <Link
-                                    href={item.href}
-                                    className={`nav-item ${isActive ? 'active' : ''}`}
-                                >
-                                    <item.icon size={20} strokeWidth={isActive ? 2.5 : 2} />
-                                    {item.name}
-                                </Link>
-                            </li>
-                        );
-                    })}
-                </ul>
+            <nav className="sidebar-nav">
+                {menuItems.map((item) => {
+                    const isActive = pathname === item.href;
+                    return (
+                        <Link
+                            key={item.href}
+                            href={item.href}
+                            className={`nav-item ${isActive ? 'active' : ''}`}
+                        >
+                            <item.icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+                            {item.name}
+                        </Link>
+                    );
+                })}
             </nav>
 
-            <div className="sidebar-footer" style={{ borderTop: '1px solid var(--border)', paddingTop: '2rem' }}>
-                <ul className="nav-list">
-                    <li>
-                        <Link href="/settings" className={`nav-item nav-item-settings ${pathname === '/settings' ? 'active' : ''}`}>
-                            <Settings size={20} />
-                            Configuración
-                        </Link>
-                    </li>
-                    <li>
-                        <button
-                            onClick={() => logout()}
-                            className="nav-item nav-item-logout"
-                            style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', marginTop: '0.5rem' }}
-                        >
-                            <LogOut size={20} />
-                            Cerrar Sesión
-                        </button>
-                    </li>
-                </ul>
+            {/* User Profile Section */}
+            <div style={{
+                marginTop: 'auto',
+                paddingTop: '1rem',
+                borderTop: '1px solid var(--border)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.75rem',
+                paddingLeft: '0.5rem'
+            }}>
+                {isLoaded && (
+                    <>
+                        <UserButton afterSignOutUrl="/" />
+                        <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                            <span style={{
+                                fontSize: '0.9rem',
+                                fontWeight: 600,
+                                color: 'var(--text-main)',
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis'
+                            }}>
+                                {user?.fullName || user?.firstName || user?.username || 'Usuario'}
+                            </span>
+                            <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
+                                Cuenta Personal
+                            </span>
+                        </div>
+                    </>
+                )}
             </div>
         </aside>
     );

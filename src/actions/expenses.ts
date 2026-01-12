@@ -55,17 +55,17 @@ export async function createExpense(formData: FormData) {
             const now = new Date();
             // Boolean to integer for SQLite if needed, but Prisma usually handles param binding.
             // However, to be safe with raw:
-            const isSharedInt = isShared ? 1 : 0;
+            // const isSharedInt = isShared ? 1 : 0; // Removed for Postgres compatibility (use boolean directly)
 
             await prisma.$executeRaw`
-                INSERT INTO Expense (
+                INSERT INTO "Expense" (
                     id, description, amount, category, type, 
-                    installmentsTotal, installmentNumber, isShared, paidBy, 
-                    userId, date, createdAt, updatedAt
+                    "installmentsTotal", "installmentNumber", "isShared", "paidBy", 
+                    "userId", date, "createdAt", "updatedAt"
                 )
                 VALUES (
                     ${id}, ${description}, ${amount}, ${category}, 'INSTALLMENT', 
-                    ${installmentsTotal}, ${i}, ${isSharedInt}, ${paidBy}, 
+                    ${installmentsTotal}, ${i}, ${isShared}, ${paidBy}, 
                     ${userId}, ${installmentDate}, ${now}, ${now}
                 )
             `;
@@ -81,17 +81,17 @@ export async function createExpense(formData: FormData) {
     } else {
         const id = randomUUID();
         const now = new Date();
-        const isSharedInt = isShared ? 1 : 0;
+        // const isSharedInt = isShared ? 1 : 0;
 
         await prisma.$executeRaw`
-            INSERT INTO Expense (
+            INSERT INTO "Expense" (
                 id, description, amount, category, type, 
-                installmentsTotal, installmentNumber, isShared, paidBy, 
-                userId, date, createdAt, updatedAt
+                "installmentsTotal", "installmentNumber", "isShared", "paidBy", 
+                "userId", date, "createdAt", "updatedAt"
             )
             VALUES (
                 ${id}, ${description}, ${amount}, ${category}, ${type}, 
-                1, 1, ${isSharedInt}, ${paidBy}, 
+                1, 1, ${isShared}, ${paidBy}, 
                 ${userId}, ${date}, ${now}, ${now}
             )
         `;
@@ -121,7 +121,7 @@ export async function updateExpense(formData: FormData) {
     const dateStr = formData.get('date') as string;
     const date = new Date(dateStr + '-01T12:00:00');
     const isShared = formData.get('isShared') === 'on';
-    const isSharedInt = isShared ? 1 : 0;
+    // const isSharedInt = isShared ? 1 : 0;
     const paidBy = formData.get('paidBy') as string || 'me';
 
     // Parse participants for update
@@ -136,15 +136,15 @@ export async function updateExpense(formData: FormData) {
     }
 
     await prisma.$executeRaw`
-        UPDATE Expense 
+        UPDATE "Expense" 
         SET description = ${description}, 
             amount = ${amount}, 
             category = ${category}, 
             date = ${date}, 
-            isShared = ${isSharedInt}, 
-            paidBy = ${paidBy},
-            updatedAt = ${new Date()}
-        WHERE id = ${id} AND userId = ${userId}
+            "isShared" = ${isShared}, 
+            "paidBy" = ${paidBy},
+            "updatedAt" = ${new Date()}
+        WHERE id = ${id} AND "userId" = ${userId}
     `;
 
     // Refresh Join Table
@@ -169,8 +169,8 @@ export async function deleteExpense(id: string) {
     const userId = session.userId as string;
 
     await prisma.$executeRaw`
-        DELETE FROM Expense 
-        WHERE id = ${id} AND userId = ${userId}
+        DELETE FROM "Expense" 
+        WHERE id = ${id} AND "userId" = ${userId}
     `;
 
     revalidatePath('/expenses');
@@ -255,8 +255,8 @@ export async function getExpenses(month?: number, year?: number) {
             const endOfMonth = new Date(year, month + 1, 0, 23, 59, 59);
 
             expenses = await prisma.$queryRaw`
-                    SELECT * FROM Expense 
-                    WHERE userId = ${userId} 
+                    SELECT * FROM "Expense" 
+                    WHERE "userId" = ${userId} 
                     AND (
                         (date >= ${startOfMonth} AND date <= ${endOfMonth})
                         OR
@@ -267,8 +267,8 @@ export async function getExpenses(month?: number, year?: number) {
         } else {
             // Return ALL expenses for history
             expenses = await prisma.$queryRaw`
-                    SELECT * FROM Expense 
-                    WHERE userId = ${userId} 
+                    SELECT * FROM "Expense" 
+                    WHERE "userId" = ${userId} 
                     ORDER BY date DESC
                 ` as any[];
         }

@@ -17,8 +17,19 @@ export default async function ExpensesPage({
 }) {
     const { month: monthStr, year: yearStr } = await searchParams;
 
-    const month = monthStr ? parseInt(monthStr as string) : 0;
-    const year = yearStr ? parseInt(yearStr as string) : 2026;
+    // Detectar mes actual + 1 por defecto
+    const now = new Date();
+    // Default logic: Next month
+    let defaultMonth = now.getMonth() + 1;
+    let defaultYear = now.getFullYear();
+
+    if (defaultMonth > 11) {
+        defaultMonth = 0;
+        defaultYear += 1;
+    }
+
+    const month = monthStr ? parseInt(monthStr as string) : defaultMonth;
+    const year = yearStr ? parseInt(yearStr as string) : defaultYear;
 
     const expensesRaw = await getExpenses(month, year);
     const categories = await getCategories();

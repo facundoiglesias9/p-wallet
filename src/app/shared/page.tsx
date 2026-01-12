@@ -1,22 +1,26 @@
 import { getSharedData } from '@/actions/shared';
 import { Users, User, ArrowRight, Home, DollarSign, Wallet } from 'lucide-react';
 import { MonthPicker } from '@/components/ui/MonthPicker';
+import { getDateFilter } from '@/actions/app-settings';
 
 export default async function SharedPage({
     searchParams,
 }: {
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-    const { month: monthStr, year: yearStr, allTime } = await searchParams;
+    const { allTime } = await searchParams;
+    const { month: cookieMonth, year: cookieYear } = await getDateFilter();
 
     // If allTime is present, we pass -1 to signal getSharedData to fetch everything
     const isAllTime = allTime === 'true';
-    const month = isAllTime ? -1 : (monthStr ? parseInt(monthStr as string) : 0);
-    const year = yearStr ? parseInt(yearStr as string) : 2026;
+    const month = isAllTime ? -1 : cookieMonth;
+    const year = cookieYear;
 
     const data = await getSharedData(month, year);
     const { oneTimePeople, cohabitants, expenses } = data;
-    const cohabitantStats = data.cohabitantStats as any;
+    // const { oneTimePeople, cohabitants, expenses } = data; // Eliminada por duplicación
+    const cohabitantStats = data.cohabitantStats as any || { totalPool: 0, myStats: { name: 'Yo', totalContributed: 0, balance: 0 } };
+    const myStats = cohabitantStats.myStats || { name: 'Yo', totalContributed: 0, balance: 0 };
 
     return (
         <div className="animate-ready" style={{ maxWidth: '1000px', margin: '0 auto', paddingBottom: '4rem' }}>
@@ -66,7 +70,7 @@ export default async function SharedPage({
                     </a>
                 </div>
 
-                {!isAllTime && <MonthPicker />}
+                {!isAllTime && <MonthPicker initialMonth={cookieMonth} initialYear={cookieYear} />}
             </header>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '2rem' }}>
@@ -226,7 +230,7 @@ export default async function SharedPage({
                                     textTransform: 'capitalize',
                                     letterSpacing: '-0.5px'
                                 }}>
-                                    {cohabitantStats.myStats.name}
+                                    {myStats.name}
                                 </div>
                                 <div style={{
                                     fontSize: '1.75rem',
@@ -234,7 +238,7 @@ export default async function SharedPage({
                                     color: '#fff',
                                     textShadow: '0 0 20px rgba(255,255,255,0.2)'
                                 }}>
-                                    ${cohabitantStats.myStats.totalContributed.toLocaleString()}
+                                    ${(myStats.totalContributed || 0).toLocaleString()}
                                 </div>
                                 <div style={{ fontSize: '0.8rem', color: 'var(--text-dim)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                                     Puso
@@ -291,7 +295,7 @@ export default async function SharedPage({
                             {(() => {
                                 // Logic: Find who is in negative (owes)
                                 const users = [
-                                    { name: cohabitantStats.myStats.name as string, balance: cohabitantStats.myStats.balance as number },
+                                    { name: myStats.name as string, balance: myStats.balance as number },
                                     ...cohabitants.map((c: any) => ({ name: c.name as string, balance: c.balance as number }))
                                 ];
 

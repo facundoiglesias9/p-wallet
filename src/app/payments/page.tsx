@@ -11,8 +11,18 @@ export default async function PaymentsPage({
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
     const { month: monthStr, year: yearStr } = await searchParams;
-    const month = monthStr ? parseInt(monthStr as string) : new Date().getMonth();
-    const year = yearStr ? parseInt(yearStr as string) : new Date().getFullYear();
+    const now = new Date();
+    // Default logic: Next month
+    let defaultMonth = now.getMonth() + 1;
+    let defaultYear = now.getFullYear();
+
+    if (defaultMonth > 11) {
+        defaultMonth = 0;
+        defaultYear += 1;
+    }
+
+    const month = monthStr ? parseInt(monthStr as string) : defaultMonth;
+    const year = yearStr ? parseInt(yearStr as string) : defaultYear;
 
     const expensesRaw = await getExpenses(month, year);
     const categoriesDb = await getCategories();
