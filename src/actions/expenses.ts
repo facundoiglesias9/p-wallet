@@ -243,6 +243,11 @@ export async function deleteCategory(id: string) {
     revalidatePath('/');
 }
 
+export async function deleteCategoryForm(formData: FormData) {
+    const id = formData.get('id') as string;
+    await deleteCategory(id);
+}
+
 export async function getExpenses(month?: number, year?: number) {
     const session = await verifySession();
     const userId = session?.userId as string;
