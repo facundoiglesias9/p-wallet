@@ -10,26 +10,11 @@ import { ExpenseForm } from '@/components/features/expenses/ExpenseForm';
 import { ExpenseItem } from '@/components/features/expenses/ExpenseItem';
 import { getPeople } from '@/actions/settings';
 
-export default async function ExpensesPage({
-    searchParams,
-}: {
-    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}) {
-    const { month: monthStr, year: yearStr } = await searchParams;
+import { getDateFilter } from '@/actions/app-settings';
 
-    // Detectar mes actual + 1 por defecto
-    const now = new Date();
-    // Default logic: Next month
-    let defaultMonth = now.getMonth() + 1;
-    let defaultYear = now.getFullYear();
-
-    if (defaultMonth > 11) {
-        defaultMonth = 0;
-        defaultYear += 1;
-    }
-
-    const month = monthStr ? parseInt(monthStr as string) : defaultMonth;
-    const year = yearStr ? parseInt(yearStr as string) : defaultYear;
+export default async function ExpensesPage() {
+    // Usamos las cookies para persistir el filtro
+    const { month, year } = await getDateFilter();
 
     const expensesRaw = await getExpenses(month, year);
     const categories = await getCategories();
@@ -38,7 +23,7 @@ export default async function ExpensesPage({
 
     const session = await (await import('@/lib/session')).verifySession();
     const userId = session?.userId as string;
-    const userRec = userId ? await prisma.$queryRaw`SELECT username FROM User WHERE id = ${userId}` as any[] : [];
+    const userRec = userId ? await prisma.$queryRaw`SELECT username FROM "User" WHERE id = ${userId}` as any[] : []; // Added quotes for Postgres safety
     const currentUserName = userRec[0]?.username || 'Yo';
 
     // Serializamos las fechas para evitar advertencias de "Date object" en props de Client Component
@@ -80,7 +65,7 @@ export default async function ExpensesPage({
                     justifyContent: 'center',
                     flexWrap: 'wrap'
                 }}>
-                    <MonthPicker />
+                    <MonthPicker initialMonth={month} initialYear={year} />
                     <div style={{ height: '30px', width: '1px', background: 'var(--border)' }}></div>
                 </div>
 
