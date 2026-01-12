@@ -6,16 +6,16 @@ import { MonthPicker } from '@/components/ui/MonthPicker';
 import prisma from '@/lib/prisma';
 import { verifySession } from '@/lib/session';
 
-export default async function IncomesPage({
-    searchParams,
-}: {
-    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}) {
-    const { month: monthStr, year: yearStr } = await searchParams;
+import { getDateFilter } from '@/actions/app-settings';
 
-    // Default to Jan 2026 (Month 1 for getIncomes logic)
-    const month = monthStr ? parseInt(monthStr as string) + 1 : 1;
-    const year = yearStr ? parseInt(yearStr as string) : 2026;
+export default async function IncomesPage() {
+    // Cookie based filter
+    const { month: selectedMonth, year } = await getDateFilter();
+    // Incomes logic expects "human month" (1-12) usually, but let's check getIncomes.
+    // getIncomes param name is "month", previously it was adding +1.
+    // Let's assume getIncomes expects 1-based month if it was doing "parseInt + 1".
+    // getDateFilter returns 0-based month. So we add 1.
+    const month = selectedMonth + 1;
 
     const incomes = await getIncomes(month, year);
 
@@ -23,12 +23,12 @@ export default async function IncomesPage({
     const session = await verifySession();
     const userId = session?.userId as string;
     const people = userId ? await prisma.$queryRaw`
-        SELECT * FROM Person 
-        WHERE userId = ${userId} AND role = 'COHABITANT'
+        SELECT * FROM "Person" 
+        WHERE "userId" = ${userId} AND role = 'COHABITANT'
         ORDER BY name ASC
     ` as any[] : [];
 
-    const userRec = userId ? await prisma.$queryRaw`SELECT username FROM User WHERE id = ${userId}` as any[] : [];
+    const userRec = userId ? await prisma.$queryRaw`SELECT username FROM "User" WHERE id = ${userId}` as any[] : [];
     const currentUserName = userRec[0]?.username || 'Yo';
 
     return (
@@ -59,7 +59,7 @@ export default async function IncomesPage({
                     justifyContent: 'center',
                     flexWrap: 'wrap'
                 }}>
-                    <MonthPicker />
+                    <MonthPicker initialMonth={selectedMonth} initialYear={year} />
                     <div style={{ height: '30px', width: '1px', background: 'var(--border)' }}></div>
                     <IncomeForm people={people} currentUserName={currentUserName} />
                 </div>

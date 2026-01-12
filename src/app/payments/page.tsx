@@ -5,24 +5,11 @@ import { toggleCategoryPaid } from '@/actions/payments';
 import prisma from '@/lib/prisma';
 import { verifySession } from '@/lib/session';
 
-export default async function PaymentsPage({
-    searchParams,
-}: {
-    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}) {
-    const { month: monthStr, year: yearStr } = await searchParams;
-    const now = new Date();
-    // Default logic: Next month
-    let defaultMonth = now.getMonth() + 1;
-    let defaultYear = now.getFullYear();
+import { getDateFilter } from '@/actions/app-settings';
 
-    if (defaultMonth > 11) {
-        defaultMonth = 0;
-        defaultYear += 1;
-    }
-
-    const month = monthStr ? parseInt(monthStr as string) : defaultMonth;
-    const year = yearStr ? parseInt(yearStr as string) : defaultYear;
+export default async function PaymentsPage() {
+    // Cookie based filter
+    const { month, year } = await getDateFilter();
 
     const expensesRaw = await getExpenses(month, year);
     const categoriesDb = await getCategories();
@@ -44,7 +31,12 @@ export default async function PaymentsPage({
             });
         } else {
             console.warn("CategoryPayment model not found on client, using raw query fallback.");
-            categoryPayments = await prisma.$queryRaw`SELECT * FROM CategoryPayment WHERE month = ${month} AND year = ${year} AND userId = ${userId}`;
+            categoryPayments = await prisma.$queryRaw`
+                SELECT * FROM "CategoryPayment" 
+                WHERE month = ${month} 
+                AND year = ${year} 
+                AND "userId" = ${userId}
+            `;
             // Map raw results if necessary (usually SQLite returns matching column names, but booleans might be 1/0)
             categoryPayments = categoryPayments.map(cp => ({
                 ...cp,
@@ -81,7 +73,7 @@ export default async function PaymentsPage({
                     Controla el pago total de cada categoría.
                 </p>
                 <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center' }}>
-                    <MonthPicker />
+                    <MonthPicker initialMonth={month} initialYear={year} />
                 </div>
             </header>
 
