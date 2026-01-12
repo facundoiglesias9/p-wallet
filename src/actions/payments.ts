@@ -14,10 +14,11 @@ export async function toggleCategoryPaid(categoryId: string, month: number, year
         // Upsert logic: if exists, update. if not, create.
         const existing = await prisma.categoryPayment.findUnique({
             where: {
-                categoryId_month_year: {
+                categoryId_month_year_userId: {
                     categoryId,
                     month,
-                    year
+                    year,
+                    userId
                 }
             }
         });
@@ -43,20 +44,34 @@ export async function toggleCategoryPaid(categoryId: string, month: number, year
         console.error("Error toggling category paid status", e);
         // Fallback for EPERM issue using raw query if client isn't ready
         try {
-            const newStatus = !currentStatus ? 1 : 0;
-            // Try to update using raw SQL as backup if Prisma client is stuck
-            // Complex upsert in raw SQL logic omitted for brevity, assuming standard flow works or re-try.
-            // But actually, we need a robust fallback.
-            const now = new Date().toISOString();
+            // Postgres fallback
+            const now = new Date(); // Use Date object for Prisma + Postgres
             const id = crypto.randomUUID();
-            const existingCheck: any[] = await prisma.$queryRaw`SELECT * FROM CategoryPayment WHERE categoryId = ${categoryId} AND month = ${month} AND year = ${year}`;
+            // Check existence
+            const existingCheck: any[] = await prisma.$queryRaw`
+                SELECT * FROM "CategoryPayment" 
+                WHERE "categoryId" = ${categoryId} 
+                AND month = ${month} 
+                AND year = ${year} 
+                AND "userId" = ${userId}
+            `;
 
             if (existingCheck.length > 0) {
                 const currentRawPaid = existingCheck[0].isPaid;
-                const newRawPaid = currentRawPaid ? 0 : 1;
-                await prisma.$executeRaw`UPDATE CategoryPayment SET isPaid = ${newRawPaid} WHERE id = ${existingCheck[0].id}`;
+                const newRawPaid = !currentRawPaid; // Boolean toggle
+                await prisma.$executeRaw`
+                    UPDATE "CategoryPayment" 
+                    SET "isPaid" = ${newRawPaid} 
+                    WHERE id = ${existingCheck[0].id}
+                `;
             } else {
-                await prisma.$executeRaw`INSERT INTO CategoryPayment (id, categoryId, month, year, isPaid, createdAt, updatedAt, userId) VALUES (${id}, ${categoryId}, ${month}, ${year}, 1, ${now}, ${now}, ${userId})`;
+                await prisma.$executeRaw`
+                    INSERT INTO "CategoryPayment" (
+                        id, "categoryId", month, year, "isPaid", "createdAt", "updatedAt", "userId"
+                    ) VALUES (
+                        ${id}, ${categoryId}, ${month}, ${year}, ${true}, ${now}, ${now}, ${userId}
+                    )
+                `;
             }
         } catch (rawError) {
             console.error("Raw fallback failed too", rawError);
