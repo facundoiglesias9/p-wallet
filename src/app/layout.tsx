@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ClerkProvider } from '@clerk/nextjs';
 import "./globals.css";
 import { Sidebar } from "@/components/layout/Sidebar";
+import { MobileNav } from "@/components/layout/MobileNav";
 
 export const metadata: Metadata = {
   title: "P-Wallet",
@@ -28,6 +29,7 @@ export default function RootLayout({
             <main className="main-content">
               {children}
             </main>
+            <MobileNav />
           </div>
         </body>
       </html>

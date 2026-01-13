@@ -627,3 +627,110 @@ input[type="month"]::-webkit-calendar-picker-indicator {
     transform: translateX(1px);
   }
 }
+
+/* Mobile Navigation and Responsiveness */
+
+/* Default: Hide Mobile Nav on Desktop */
+.mobile-nav {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  /* Layout adjustments */
+  .app-container {
+    display: block; /* Remove grid */
+  }
+
+  .sidebar {
+    display: none; /* Hide sidebar */
+  }
+
+  .main-content {
+    padding: 1.5rem 1rem 6rem 1rem; /* Smaller padding, space for bottom bar */
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Grid adjustments for Dashboard stats */
+  .stats-grid {
+    grid-template-columns: 1fr; /* Stack cards */
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  /* Adjust metallic titles size */
+  .title-metallic-dashboard,
+  .title-metallic-expense,
+  .title-metallic-income,
+  .title-metallic-category,
+  .title-metallic {
+    font-size: 2rem !important;
+  }
+  
+  /* Modal adjustments */
+  .modal-window {
+    width: 95%;
+    max-height: 80vh;
+  }
+
+  /* Mobile Bottom Navigation Bar */
+  .mobile-nav {
+    display: block;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(16, 18, 26, 0.95);
+    backdrop-filter: blur(16px);
+    border-top: 1px solid var(--border);
+    z-index: 9999;
+    padding-bottom: env(safe-area-inset-bottom); /* iOS safe area */
+  }
+
+  .mobile-nav-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* Start aligned for scrolling */
+    overflow-x: auto; /* Enable horizontal scroll */
+    padding: 0.75rem 0.5rem;
+    gap: 0.5rem;
+    scrollbar-width: none; /* Firefox hide scrollbar */
+    -ms-overflow-style: none; /* IE hide scrollbar */
+  }
+
+  .mobile-nav-container::-webkit-scrollbar {
+    display: none; /* Chrome hide scrollbar */
+  }
+
+  .mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 70px; /* Ensure touch target size */
+    padding: 0.5rem;
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 0.7rem;
+    gap: 0.25rem;
+    border-radius: 12px;
+    transition: 0.2s;
+    flex-shrink: 0; /* Prevent shrinking */
+  }
+
+  .mobile-nav-item.active {
+    color: var(--primary);
+    background: rgba(99, 102, 241, 0.1);
+  }
+
+  .mobile-nav-item.active .icon-wrapper {
+    background: rgba(99, 102, 241, 0.15);
+    border-radius: 12px;
+  }
+
+  .icon-wrapper {
+    padding: 0.4rem;
+    border-radius: 10px;
+    transition: 0.2s;
+  }
+}
