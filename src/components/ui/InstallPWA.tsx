@@ -9,8 +9,13 @@ export function InstallPWA() {
     const [isStandalone, setIsStandalone] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [canInstallNative, setCanInstallNative] = useState(false);
+    const [isInAppBrowser, setIsInAppBrowser] = useState(false);
 
     useEffect(() => {
+        const ua = navigator.userAgent || navigator.vendor || (window as any).opera;
+        const isInApp = /FBAN|FBAV|Instagram|WhatsApp|Line|Twitter|Threads|Webview/i.test(ua);
+        setIsInAppBrowser(isInApp);
+
         // Detect iOS
         setIsIOS(
             /iPad|iPhone|iPod/.test(navigator.userAgent) &&
@@ -150,10 +155,12 @@ export function InstallPWA() {
                         </div>
 
                         <h2 style={{ fontSize: '1.75rem', fontWeight: 850, marginBottom: '0.75rem', letterSpacing: '-0.5px' }}>
-                            Instalar P-Wallet
+                            {isInAppBrowser ? 'Navegador Interno' : 'Instalar P-Wallet'}
                         </h2>
                         <p style={{ color: 'var(--text-dim)', marginBottom: '2.5rem', lineHeight: 1.5 }}>
-                            Lleva el control de tus finanzas en tu pantalla de inicio como una aplicación nativa.
+                            {isInAppBrowser
+                                ? 'Estás viendo esto desde una app (como WhatsApp). Para instalar, abre el link directamente en Chrome o Samsung Internet.'
+                                : 'Lleva el control de tus finanzas en tu pantalla de inicio como una aplicación nativa.'}
                         </p>
 
                         {isIOS ? (
