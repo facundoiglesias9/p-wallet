@@ -230,26 +230,35 @@ export function InstallPWA() {
                                         display: 'inline-flex',
                                         alignItems: 'center',
                                         gap: '0.75rem',
-                                        background: isInstalling ? 'var(--border)' : 'var(--primary)',
+                                        background: isInstalling ? 'var(--border)' : (canInstallNative ? 'var(--primary)' : 'rgba(255,255,255,0.1)'),
                                         padding: '0.85rem 1.5rem',
                                         borderRadius: '14px',
                                         fontWeight: 700,
                                         color: 'white',
                                         border: 'none',
                                         cursor: isInstalling ? 'not-allowed' : 'pointer',
-                                        boxShadow: isInstalling ? 'none' : '0 10px 20px rgba(99, 102, 241, 0.3)',
+                                        boxShadow: isInstalling || !canInstallNative ? 'none' : '0 10px 20px rgba(99, 102, 241, 0.3)',
                                         transition: '0.2s',
                                         opacity: isInstalling ? 0.7 : 1
                                     }}
-                                    className={!isInstalling ? "active:scale-95" : ""}
+                                    className={(!isInstalling && canInstallNative) ? "active:scale-95" : ""}
                                 >
                                     {isInstalling ? (
                                         <div className="animate-spin" style={{ width: '18px', height: '18px', border: '2px solid white', borderTopColor: 'transparent', borderRadius: '50%' }}></div>
                                     ) : (
                                         <Smartphone size={20} />
                                     )}
-                                    <span>{isInstalling ? 'Conectando...' : 'Instalar aplicación'}</span>
+                                    <span>
+                                        {isInstalling
+                                            ? 'Verificando...'
+                                            : (canInstallNative ? 'Instalar aplicación' : 'Esperando permiso...')}
+                                    </span>
                                 </button>
+                                {!canInstallNative && !isInstalling && (
+                                    <p style={{ marginTop: '1rem', fontSize: '0.75rem', color: 'var(--warning)', opacity: 0.8 }}>
+                                        * El navegador tarda unos segundos en habilitar la instalación.
+                                    </p>
+                                )}
                             </div>
                         )}
                     </div>

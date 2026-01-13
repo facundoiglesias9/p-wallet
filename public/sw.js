@@ -1,5 +1,4 @@
-// Minimal Service Worker to enable PWA without interfering with Auth
-self.addEventListener('install', () => {
+self.addEventListener('install', (event) => {
     self.skipWaiting();
 });
 
@@ -7,9 +6,7 @@ self.addEventListener('activate', (event) => {
     event.waitUntil(clients.claim());
 });
 
+// fetch handler is MANDATORY for PWA installation
 self.addEventListener('fetch', (event) => {
-    // We strictly pass through all requests. 
-    // Samsung/Chrome only check if a fetch handler exists.
-    // We do NOT use event.respondWith() unless absolutely necessary 
-    // to avoid breaking authentication redirects.
+    event.respondWith(fetch(event.request));
 });
