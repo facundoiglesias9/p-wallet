@@ -1,42 +1,9 @@
-const CACHE_NAME = 'p-wallet-v3';
-const ASSETS_TO_CACHE = [
-    '/',
-    '/manifest.json',
-    '/icon-192.png',
-    '/icon-512.png'
-];
-
-self.addEventListener('install', (event) => {
-    event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE))
-    );
-    self.skipWaiting();
-});
-
-self.addEventListener('activate', (event) => {
-    event.waitUntil(
-        caches.keys().then((keys) => Promise.all(
-            keys.map((key) => key !== CACHE_NAME && caches.delete(key))
-        ))
-    );
-    self.clients.claim();
-});
+// Minimalistic Service Worker for Zero Latency
+// Satisfies PWA installation without intercepting traffic
+self.addEventListener('install', () => self.skipWaiting());
+self.addEventListener('activate', (event) => event.waitUntil(clients.claim()));
 
 self.addEventListener('fetch', (event) => {
-    // Solo interceptamos pedidos de navegación o archivos estáticos clave
-    // para permitir que el resto de los datos (login, prisma, etc.) fluyan rápido
-    if (event.request.mode === 'navigate') {
-        event.respondWith(
-            fetch(event.request).catch(() => caches.match('/'))
-        );
-        return;
-    }
-
-    // Para el resto, dejamos que el navegador maneje la velocidad nativa
-    // salvo que el archivo esté explícitamente en el cache
-    event.respondWith(
-        caches.match(event.request).then((response) => {
-            return response || fetch(event.request);
-        })
-    );
+    // We do NOT call event.respondWith() 
+    // This allows the browser to handle all requests at native speed
 });
