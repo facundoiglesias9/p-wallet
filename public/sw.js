@@ -1,35 +1,13 @@
-const CACHE_NAME = 'p-wallet-v1';
-const ASSETS = [
-    '/',
-    '/manifest.json',
-    '/icon-192.png',
-    '/icon-512.png'
-];
-
-self.addEventListener('install', (event) => {
-    event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(ASSETS);
-        })
-    );
+// Minimal Service Worker for PWA compliance
+self.addEventListener('install', () => {
     self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
-    event.waitUntil(
-        caches.keys().then((keys) => {
-            return Promise.all(
-                keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
-            );
-        })
-    );
-    self.skipWaiting();
+    event.waitUntil(clients.claim());
 });
 
-self.addEventListener('fetch', (event) => {
-    event.respondWith(
-        fetch(event.request).catch(() => {
-            return caches.match(event.request);
-        })
-    );
+// We don't fetch anything to avoid interfering with auth or external scripts
+self.addEventListener('fetch', () => {
+    // Do nothing, let the browser handle it
 });
