@@ -10,6 +10,7 @@ export function InstallPWA() {
     const [showModal, setShowModal] = useState(false);
     const [canInstallNative, setCanInstallNative] = useState(false);
     const [isInAppBrowser, setIsInAppBrowser] = useState(false);
+    const [isInstalling, setIsInstalling] = useState(false);
 
     useEffect(() => {
         const ua = navigator.userAgent || navigator.vendor || (window as any).opera;
@@ -48,23 +49,28 @@ export function InstallPWA() {
 
     const handleInstallClick = async (e?: React.MouseEvent) => {
         if (e) e.stopPropagation();
+        setIsInstalling(true);
 
-        const promptToUse = deferredPrompt || (window as any).deferredPrompt;
+        // Simulamos un breve retraso para dar feedback visual
+        setTimeout(async () => {
+            const promptToUse = deferredPrompt || (window as any).deferredPrompt;
 
-        if (canInstallNative && promptToUse) {
-            // Native prompt for Android/Windows/Chrome
-            promptToUse.prompt();
-            const { outcome } = await promptToUse.userChoice;
-            if (outcome === 'accepted') {
-                setCanInstallNative(false);
-                setDeferredPrompt(null);
-                (window as any).deferredPrompt = null;
-                setShowModal(false);
+            if (canInstallNative && promptToUse) {
+                // Native prompt for Android/Windows/Chrome
+                promptToUse.prompt();
+                const { outcome } = await promptToUse.userChoice;
+                if (outcome === 'accepted') {
+                    setCanInstallNative(false);
+                    setDeferredPrompt(null);
+                    (window as any).deferredPrompt = null;
+                    setShowModal(false);
+                }
+            } else {
+                // Show instructions for iOS or if prompt is not available
+                setShowModal(true);
             }
-        } else {
-            // Show instructions for iOS or if prompt is not available
-            setShowModal(true);
-        }
+            setIsInstalling(false);
+        }, 800);
     };
 
     if (isStandalone) {
@@ -79,43 +85,53 @@ export function InstallPWA() {
                 top: 0,
                 left: 0,
                 zIndex: 100000,
-                background: 'rgba(0,0,0,0.8)',
+                background: 'rgba(0,0,0,0.85)',
                 color: '#fff',
-                fontSize: '10px',
-                padding: '10px',
+                fontSize: '11px',
+                padding: '12px',
                 pointerEvents: 'none',
-                maxWidth: '60vw',
-                fontFamily: 'monospace'
+                maxWidth: '80vw',
+                fontFamily: 'monospace',
+                borderRadius: '0 0 16px 0',
+                border: '1px solid rgba(255,255,255,0.1)',
+                borderTop: 'none',
+                borderLeft: 'none'
             }}>
-                PWA DEBUG:<br />
-                NativePrompt: {canInstallNative ? 'SI' : 'NO'}<br />
+                <div style={{ fontWeight: 'bold', marginBottom: '4px', color: 'var(--primary)' }}>PWA DIAGNOSTIC</div>
+                NativePrompt: {canInstallNative ? '🟢 SI' : '🔴 NO (Esperando...)'}<br />
                 Deferred: {deferredPrompt ? 'OK' : 'NULL'}<br />
-                InApp: {isInAppBrowser ? 'SI' : 'NO'}<br />
-                Standalone: {isStandalone ? 'SI' : 'NO'}<br />
-                SW: {('serviceWorker' in navigator) ? 'SUPPORTED' : 'NO'}
+                Protocol: {typeof window !== 'undefined' ? (window.location.protocol === 'https:' ? '🟢 HTTPS' : '🔴 ' + window.location.protocol) : 'N/A'}<br />
+                InApp: {isInAppBrowser ? '🔶 SI' : '🟢 NO'}<br />
+                SW: {('serviceWorker' in navigator) ? '🟢 OK' : '🔴 NO'}
             </div>
 
             <button
                 onClick={handleInstallClick}
+                disabled={isInstalling}
                 style={{
                     display: 'flex',
                     alignItems: 'center',
                     gap: '0.6rem',
-                    background: 'linear-gradient(135deg, var(--primary) 0%, #4f46e5 100%)',
+                    background: isInstalling ? 'var(--border)' : 'linear-gradient(135deg, var(--primary) 0%, #4f46e5 100%)',
                     border: 'none',
                     padding: '0.6rem 1.2rem',
                     borderRadius: '16px',
                     color: 'white',
                     fontWeight: 700,
                     fontSize: '0.9rem',
-                    cursor: 'pointer',
-                    boxShadow: '0 8px 20px rgba(79, 70, 229, 0.4)',
-                    transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+                    cursor: isInstalling ? 'not-allowed' : 'pointer',
+                    boxShadow: isInstalling ? 'none' : '0 8px 20px rgba(79, 70, 229, 0.4)',
+                    transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                    opacity: isInstalling ? 0.7 : 1
                 }}
-                className="hover:scale-105 active:scale-95"
+                className={!isInstalling ? "hover:scale-105 active:scale-95" : ""}
             >
-                {canInstallNative ? <Sparkles size={18} /> : <Smartphone size={18} />}
-                <span>{canInstallNative ? 'Instalar App' : 'App Móvil'}</span>
+                {isInstalling ? (
+                    <div className="animate-spin" style={{ width: '18px', height: '18px', border: '2px solid white', borderTopColor: 'transparent', borderRadius: '50%' }}></div>
+                ) : (
+                    canInstallNative ? <Sparkles size={18} /> : <Smartphone size={18} />
+                )}
+                <span>{isInstalling ? 'Conectando...' : (canInstallNative ? 'Instalar App' : 'App Móvil')}</span>
             </button>
 
             {showModal && (
@@ -209,24 +225,30 @@ export function InstallPWA() {
                                 </p>
                                 <button
                                     onClick={handleInstallClick}
+                                    disabled={isInstalling}
                                     style={{
                                         display: 'inline-flex',
                                         alignItems: 'center',
                                         gap: '0.75rem',
-                                        background: 'var(--primary)',
+                                        background: isInstalling ? 'var(--border)' : 'var(--primary)',
                                         padding: '0.85rem 1.5rem',
                                         borderRadius: '14px',
                                         fontWeight: 700,
                                         color: 'white',
                                         border: 'none',
-                                        cursor: 'pointer',
-                                        boxShadow: '0 10px 20px rgba(99, 102, 241, 0.3)',
-                                        transition: '0.2s'
+                                        cursor: isInstalling ? 'not-allowed' : 'pointer',
+                                        boxShadow: isInstalling ? 'none' : '0 10px 20px rgba(99, 102, 241, 0.3)',
+                                        transition: '0.2s',
+                                        opacity: isInstalling ? 0.7 : 1
                                     }}
-                                    className="active:scale-95"
+                                    className={!isInstalling ? "active:scale-95" : ""}
                                 >
-                                    <Smartphone size={20} />
-                                    Instalar aplicación
+                                    {isInstalling ? (
+                                        <div className="animate-spin" style={{ width: '18px', height: '18px', border: '2px solid white', borderTopColor: 'transparent', borderRadius: '50%' }}></div>
+                                    ) : (
+                                        <Smartphone size={20} />
+                                    )}
+                                    <span>{isInstalling ? 'Conectando...' : 'Instalar aplicación'}</span>
                                 </button>
                             </div>
                         )}
