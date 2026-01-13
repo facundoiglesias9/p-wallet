@@ -1,4 +1,5 @@
-self.addEventListener('install', (event) => {
+// Minimal Service Worker to enable PWA without interfering with Auth
+self.addEventListener('install', () => {
     self.skipWaiting();
 });
 
@@ -7,12 +8,8 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-    // Required for PWA to be installable: respondWith must be called
-    event.respondWith(
-        fetch(event.request).catch(() => {
-            // Fallback or just let it fail if offline, 
-            // but the call to respondWith is what triggers the PWA criteria
-            return new Response("Offline");
-        })
-    );
+    // We strictly pass through all requests. 
+    // Samsung/Chrome only check if a fetch handler exists.
+    // We do NOT use event.respondWith() unless absolutely necessary 
+    // to avoid breaking authentication redirects.
 });
