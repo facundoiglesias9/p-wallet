@@ -1,7 +1,6 @@
-const CACHE_NAME = 'p-wallet-v2';
+const CACHE_NAME = 'p-wallet-v3';
 const ASSETS_TO_CACHE = [
     '/',
-    '/dashboard',
     '/manifest.json',
     '/icon-192.png',
     '/icon-512.png'
@@ -9,32 +8,35 @@ const ASSETS_TO_CACHE = [
 
 self.addEventListener('install', (event) => {
     event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(ASSETS_TO_CACHE);
-        })
+        caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE))
     );
     self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
     event.waitUntil(
-        caches.keys().then((cacheNames) => {
-            return Promise.all(
-                cacheNames.map((cacheName) => {
-                    if (cacheName !== CACHE_NAME) {
-                        return caches.delete(cacheName);
-                    }
-                })
-            );
-        })
+        caches.keys().then((keys) => Promise.all(
+            keys.map((key) => key !== CACHE_NAME && caches.delete(key))
+        ))
     );
-    self.skipWaiting();
+    self.clients.claim();
 });
 
 self.addEventListener('fetch', (event) => {
+    // Solo interceptamos pedidos de navegación o archivos estáticos clave
+    // para permitir que el resto de los datos (login, prisma, etc.) fluyan rápido
+    if (event.request.mode === 'navigate') {
+        event.respondWith(
+            fetch(event.request).catch(() => caches.match('/'))
+        );
+        return;
+    }
+
+    // Para el resto, dejamos que el navegador maneje la velocidad nativa
+    // salvo que el archivo esté explícitamente en el cache
     event.respondWith(
-        fetch(event.request).catch(() => {
-            return caches.match(event.request);
+        caches.match(event.request).then((response) => {
+            return response || fetch(event.request);
         })
     );
 });
