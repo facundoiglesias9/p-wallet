@@ -294,3 +294,38 @@ export async function getExpenses(month?: number, year?: number) {
 export async function getCategories() {
     return await prisma.category.findMany();
 }
+
+export async function getCategoriesWithStats() {
+    const session = await verifySession();
+    const userId = session?.userId as string;
+
+    const categories = await prisma.category.findMany({
+        orderBy: { name: 'asc' }
+    });
+
+    if (!userId) {
+        return categories.map(c => ({
+            ...c,
+            count: 0,
+            total: '$0'
+        }));
+    }
+
+    // Aggregate expenses by category for this user
+    const stats = await prisma.expense.groupBy({
+        by: ['category'],
+        where: { userId },
+        _count: { id: true },
+        _sum: { amount: true }
+    });
+
+    // Map stats to categories
+    return categories.map(cat => {
+        const stat = stats.find(s => s.category === cat.name); // Linking by Name as Expenses store category Name currently
+        return {
+            ...cat,
+            count: stat?._count.id || 0,
+            total: stat?._sum.amount ? `$${stat._sum.amount.toLocaleString()}` : '$0'
+        };
+    });
+}

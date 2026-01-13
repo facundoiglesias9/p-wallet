@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, CreditCard, Banknote, Target, Settings, CheckCircle2, Users } from 'lucide-react';
+import { LayoutDashboard, CreditCard, Banknote, Target, Settings, CheckCircle2, Users, Layers } from 'lucide-react';
 
 const menuItems = [
     { name: 'Inicio', icon: LayoutDashboard, href: '/dashboard' },
@@ -10,6 +10,7 @@ const menuItems = [
     { name: 'Pagos', icon: CheckCircle2, href: '/payments' },
     { name: 'Ingresos', icon: Banknote, href: '/incomes' },
     { name: 'Planes', icon: Target, href: '/plans' },
+    { name: 'Categ.', icon: Layers, href: '/categories' },
     { name: 'Grupo', icon: Users, href: '/shared' },
     { name: 'Ajustes', icon: Settings, href: '/settings' },
 ];

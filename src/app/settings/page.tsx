@@ -1,12 +1,10 @@
 import { getPeople, createPerson, deletePerson } from '@/actions/settings';
-import { getCategories, createCategory, deleteCategoryForm } from '@/actions/expenses';
-import { Settings, Users, ArrowLeft, Trash2, Plus, Layers } from 'lucide-react';
+import { Settings, Users, ArrowLeft, Trash2, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { LogoutButton } from '@/components/features/auth/LogoutButton';
 
 export default async function SettingsPage() {
     const people = await getPeople();
-    const categories = await getCategories();
 
     return (
         <div className="animate-ready" style={{ maxWidth: '800px', margin: '0 auto', paddingBottom: '4rem' }}>
@@ -111,106 +109,9 @@ export default async function SettingsPage() {
                         </div>
                     </form>
                 </div>
-                {/* SECCIÓN: CATEGORÍAS */}
-                <div className="section-card" style={{ marginTop: '2rem' }}>
-                    <div className="section-header">
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                            <Layers size={24} color="var(--primary)" />
-                            <h2 style={{ fontSize: '1.5rem', fontWeight: 700 }}>Categorías de Gastos</h2>
-                        </div>
-                    </div>
+            </div>
 
-                    <p style={{ color: 'var(--text-dim)', marginBottom: '2rem' }}>
-                        Personaliza las categorías para clasificar tus movimientos.
-                    </p>
-
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                        {categories.map((cat: any) => (
-                            <div key={cat.id} style={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                padding: '0.75rem 1rem',
-                                background: 'var(--bg-card-hover)',
-                                borderRadius: '12px',
-                                border: '1px solid var(--border)'
-                            }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                    <div style={{
-                                        width: '32px',
-                                        height: '32px',
-                                        borderRadius: '8px',
-                                        background: cat.color || '#6366f1',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        color: '#fff'
-                                    }}>
-                                        {/* Simplification: Just show first letter if dynamic icon isn't easy */}
-                                        <span style={{ fontSize: '0.8rem', fontWeight: 700 }}>{cat.name.charAt(0).toUpperCase()}</span>
-                                    </div>
-                                    <span style={{ fontWeight: 600 }}>{cat.name}</span>
-                                </div>
-
-                                <form action={deleteCategoryForm}>
-                                    <input type="hidden" name="id" value={cat.id} />
-                                    <button type="submit" style={{
-                                        background: 'transparent',
-                                        border: 'none',
-                                        padding: '0.5rem',
-                                        cursor: 'pointer',
-                                        color: 'var(--text-dim)',
-                                        opacity: 0.7
-                                    }}>
-                                        <Trash2 size={16} />
-                                    </button>
-                                </form>
-                            </div>
-                        ))}
-
-                        <form action={createCategory} style={{ marginTop: '1.5rem', padding: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '16px' }}>
-                            <h4 style={{ marginBottom: '1rem', fontSize: '0.9rem', color: 'var(--text-dim)' }}>Nueva Categoría</h4>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
-                                <input
-                                    name="name"
-                                    placeholder="Nombre (ej. Supermercado)"
-                                    className="input-premium"
-                                    required
-                                />
-                                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                    <input
-                                        type="color"
-                                        name="color"
-                                        defaultValue="#6366f1"
-                                        style={{
-                                            height: '45px',
-                                            width: '45px',
-                                            padding: '0',
-                                            border: 'none',
-                                            borderRadius: '8px',
-                                            cursor: 'pointer',
-                                            background: 'transparent'
-                                        }}
-                                    />
-                                    <select name="icon" className="input-premium" style={{ flex: 1 }}>
-                                        <option value="ShoppingCart">Carrito</option>
-                                        <option value="Home">Casa</option>
-                                        <option value="Car">Auto</option>
-                                        <option value="Utensils">Comida</option>
-                                        <option value="Zap">Servicios</option>
-                                        <option value="Heart">Salud</option>
-                                        <option value="Globe">Viajes</option>
-                                        <option value="Music">Ocio</option>
-                                        <option value="Tag">Otros</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <button type="submit" className="btn-premium" style={{ width: '100%', justifyContent: 'center', background: 'var(--primary)' }}>
-                                <Plus size={18} /> Crear Categoría
-                            </button>
-                        </form>
-                    </div>
-                </div>
+            <div style={{ marginTop: '3rem', textAlign: 'center' }}>
                 <LogoutButton />
             </div>
         </div>

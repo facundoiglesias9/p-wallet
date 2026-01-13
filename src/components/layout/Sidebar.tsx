@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, CreditCard, Banknote, Target, Settings, Wallet, CheckCircle2, Users } from 'lucide-react';
+import { LayoutDashboard, CreditCard, Banknote, Target, Settings, Wallet, CheckCircle2, Users, Layers } from 'lucide-react';
 import { UserButton, useUser } from "@clerk/nextjs";
 
 const menuItems = [
@@ -11,6 +11,7 @@ const menuItems = [
     { name: 'Pagos Mensuales', icon: CheckCircle2, href: '/payments' },
     { name: 'Ingresos', icon: Banknote, href: '/incomes' },
     { name: 'Planes de Gastos', icon: Target, href: '/plans' },
+    { name: 'Categorías', icon: Layers, href: '/categories' },
     { name: 'Compartidos', icon: Users, href: '/shared' },
     { name: 'Configuración', icon: Settings, href: '/settings' },
 ];

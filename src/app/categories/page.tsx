@@ -1,100 +1,103 @@
-import {
-    Plus,
-    Utensils,
-    Car,
-    Tv,
-    Home,
-    ShoppingBag,
-    Heart,
-    Gamepad2,
-    Coffee,
-    MoreVertical,
-    Shapes,
-    LucideIcon,
-    Zap, Bus, Shirt, Music, Plane, GraduationCap, CreditCard, Banknote, Coins
-} from 'lucide-react';
-import prisma from '@/lib/prisma';
-import { CategoryForm } from '@/components/features/categories/CategoryForm';
+import { getCategoriesWithStats, createCategory } from '@/actions/expenses';
 import { CategoryItem } from '@/components/features/categories/CategoryItem';
-
-import { verifySession } from '@/lib/session';
+import { Layers, Plus, ShoppingCart, Home, Car, Utensils, Zap, Heart, Globe, Music, Tag } from 'lucide-react';
 
 export default async function CategoriesPage() {
-    const categoriesDb = await prisma.category.findMany();
-
-    const session = await verifySession();
-    const userId = session?.userId as string;
-
-    // Explicitly scope expenses to the current user using raw SQL to ensure correctness and bypass stale types
-    let expensesDb: any[] = [];
-    if (userId) {
-        try {
-            expensesDb = await prisma.$queryRaw`
-                SELECT * FROM Expense 
-                WHERE userId = ${userId}
-            ` as any[];
-        } catch (e) {
-            console.error("Failed to fetch expenses for categories", e);
-            expensesDb = [];
-        }
-    }
-
-    const iconMap: Record<string, LucideIcon> = {
-        Utensils, Car, Tv, Home, ShoppingBag, Heart, Gamepad2, Coffee, Zap, Bus, Shirt, Music, Plane, GraduationCap, CreditCard, Banknote, Coins,
-        Hash: Shapes
-    };
-
-    const categories = categoriesDb.map((cat: any) => {
-        const relatedExpenses = expensesDb.filter((e: any) => e.category === cat.name);
-        // Calculate Total per Category
-        const total = relatedExpenses.reduce((sum: number, e: any) => sum + e.amount, 0);
-        return {
-            ...cat,
-            // Pass icon NAME as check, but we need component for render if we want to pass it down properly or handle inside.
-            // Actually CategoryItem expects the Icon Component or handles string mapping?
-            // CategoryItem prop iconComponent expects component.
-            count: relatedExpenses.length,
-            total: `$${total.toLocaleString()}`
-        };
-    });
+    const categories = await getCategoriesWithStats();
 
     return (
-        <div className="animate-ready" style={{ maxWidth: '1200px', margin: '0 auto' }}>
+        <div className="animate-ready" style={{ maxWidth: '1000px', margin: '0 auto', paddingBottom: '4rem' }}>
 
-            <header style={{
-                marginBottom: '4rem',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '2rem'
-            }}>
-                <div style={{ textAlign: 'center' }}>
-                    <h1 className="title-metallic-category">
-                        Categorías
-                    </h1>
-                    <p style={{ color: 'var(--text-dim)', fontSize: '1.1rem', fontWeight: 500, marginTop: '0.5rem' }}>
-                        Organiza tus gastos e ingresos con etiquetas.
-                    </p>
+            {/* Header */}
+            <header style={{ marginBottom: '3rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <div className="icon-box" style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-main)' }}>
+                        <Layers size={28} />
+                    </div>
+                    <div>
+                        <h1 className="title-metallic-category" style={{ fontSize: '2.5rem', margin: 0, lineHeight: 1.2 }}>
+                            Categorías
+                        </h1>
+                        <p style={{ color: 'var(--text-dim)', marginTop: '0.25rem' }}>
+                            Gestiona tus etiquetas de gastos
+                        </p>
+                    </div>
                 </div>
-
-                <CategoryForm />
             </header>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
-                {categories.length === 0 ? (
-                    <div style={{ gridColumn: '1/-1', textAlign: 'center', color: 'var(--text-dim)', padding: '4rem' }}>
-                        No hay categorías creadas aún.
+            {/* Create Section */}
+            <div className="section-card" style={{ marginBottom: '3rem', background: 'linear-gradient(145deg, rgba(99, 102, 241, 0.05) 0%, rgba(99, 102, 241, 0.01) 100%)', border: '1px solid rgba(99, 102, 241, 0.2)' }}>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <Plus size={20} className="text-primary" /> Crear Nueva Categoría
+                </h3>
+
+                <form action={createCategory}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', alignItems: 'end' }}>
+                        <div>
+                            <label className="form-label-premium">Nombre</label>
+                            <input
+                                name="name"
+                                placeholder="Ej. Supermercado"
+                                className="input-premium"
+                                required
+                            />
+                        </div>
+
+                        <div>
+                            <label className="form-label-premium">Color e Ícono</label>
+                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <input
+                                    type="color"
+                                    name="color"
+                                    defaultValue="#6366f1"
+                                    style={{
+                                        height: '45px',
+                                        width: '45px',
+                                        padding: '0',
+                                        border: 'none',
+                                        borderRadius: '12px',
+                                        cursor: 'pointer',
+                                        background: 'transparent'
+                                    }}
+                                />
+                                <select name="icon" className="input-premium" style={{ flex: 1, cursor: 'pointer' }}>
+                                    <option value="ShoppingCart">Carrito 🛒</option>
+                                    <option value="Home">Casa 🏠</option>
+                                    <option value="Car">Auto 🚗</option>
+                                    <option value="Utensils">Comida 🍽️</option>
+                                    <option value="Zap">Servicios ⚡</option>
+                                    <option value="Heart">Salud ❤️</option>
+                                    <option value="Globe">Viajes 🌎</option>
+                                    <option value="Music">Ocio 🎵</option>
+                                    <option value="Tag">Otro 🏷️</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="submit" className="btn-premium btn-primary-wave" style={{ justifyContent: 'center' }}>
+                            <Plus size={20} />
+                            Crear
+                        </button>
                     </div>
-                ) : (
-                    categories.map((cat: any) => (
-                        <CategoryItem
-                            key={cat.id}
-                            category={cat}
-                            iconName={cat.icon}
-                        />
-                    ))
-                )}
+                </form>
             </div>
+
+            {/* List */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
+                {categories.map(cat => (
+                    <CategoryItem
+                        key={cat.id}
+                        category={cat}
+                        iconName={cat.icon}
+                    />
+                ))}
+            </div>
+
+            {categories.length === 0 && (
+                <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-dim)', border: '1px dashed var(--border)', borderRadius: '24px' }}>
+                    No tienes categorías creadas. ¡Crea la primera arriba!
+                </div>
+            )}
         </div>
     );
 }
