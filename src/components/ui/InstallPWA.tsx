@@ -76,31 +76,7 @@ export function InstallPWA() {
 
     return (
         <>
-            {/* Visual Debugger for PWA - Only visible during troubleshooting */}
-            <div style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                zIndex: 100000,
-                background: 'rgba(0,0,0,0.85)',
-                color: '#fff',
-                fontSize: '11px',
-                padding: '12px',
-                pointerEvents: 'none',
-                maxWidth: '80vw',
-                fontFamily: 'monospace',
-                borderRadius: '0 0 16px 0',
-                border: '1px solid rgba(255,255,255,0.1)',
-                borderTop: 'none',
-                borderLeft: 'none'
-            }}>
-                <div style={{ fontWeight: 'bold', marginBottom: '4px', color: 'var(--primary)' }}>PWA DIAGNOSTIC</div>
-                NativePrompt: {canInstallNative ? '🟢 SI' : '🔴 NO (Esperando...)'}<br />
-                Deferred: {deferredPrompt ? 'OK' : 'NULL'}<br />
-                Protocol: {typeof window !== 'undefined' ? (window.location.protocol === 'https:' ? '🟢 HTTPS' : '🔴 ' + window.location.protocol) : 'N/A'}<br />
-                InApp: {isInAppBrowser ? '🔶 SI' : '🟢 NO'}<br />
-                SW: {('serviceWorker' in navigator) ? '🟢 OK' : '🔴 NO'}
-            </div>
+
 
             <button
                 onClick={handleInstallClick}
