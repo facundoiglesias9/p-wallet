@@ -9,24 +9,8 @@ export async function verifySession() {
         return null;
     }
 
-    // Opcional: Asegurar que el usuario existe en nuestra DB local para mantener integridad referencial
-    // Esto es útil si tienes relaciones Foreign Key estrictas con la tabla User
-    try {
-        await prisma.user.upsert({
-            where: { id: userId },
-            update: {}, // No actualizar nada si ya existe
-            create: {
-                id: userId,
-                // Como Clerk maneja la auth, usamos el ID como username temporal si es un usuario nuevo
-                username: `user_${userId}`, // Usamos ID completo para evitar colisiones
-                password: 'placeholder', // Placeholder, no se usa
-            }
-        });
-    } catch (error) {
-        console.error("Error sincronizando usuario Clerk con Prisma:", error);
-        // Continuamos igual, esperando que no explote si la FK es opcional
-    }
-
+    // Ya no hacemos upsert en cada petición para ganar velocidad.
+    // El usuario se sincroniza por otros medios o se asume que existe.
     return { userId };
 }
 

@@ -11,24 +11,26 @@ import { getDateFilter } from '@/actions/app-settings';
 export default async function IncomesPage() {
     // Cookie based filter
     const { month: selectedMonth, year } = await getDateFilter();
-    // Incomes logic expects "human month" (1-12) usually, but let's check getIncomes.
-    // getIncomes param name is "month", previously it was adding +1.
-    // Let's assume getIncomes expects 1-based month if it was doing "parseInt + 1".
-    // getDateFilter returns 0-based month. So we add 1.
     const month = selectedMonth + 1;
 
-    const incomes = await getIncomes(month, year);
+    // Fetch in parallel
+    const [incomes, session] = await Promise.all([
+        getIncomes(month, year),
+        verifySession()
+    ]);
 
-    // Fetch pool of people for the income form (Raw SQL for stability)
-    const session = await verifySession();
     const userId = session?.userId as string;
-    const people = userId ? await prisma.$queryRaw`
-        SELECT * FROM "Person" 
-        WHERE "userId" = ${userId} AND role = 'COHABITANT'
-        ORDER BY name ASC
-    ` as any[] : [];
 
-    const userRec = userId ? await prisma.$queryRaw`SELECT username FROM "User" WHERE id = ${userId}` as any[] : [];
+    // Remaining queries also in parallel
+    const [people, userRec] = await Promise.all([
+        userId ? prisma.$queryRaw`
+            SELECT * FROM "Person" 
+            WHERE "userId" = ${userId} AND role = 'COHABITANT'
+            ORDER BY name ASC
+        ` as Promise<any[]> : Promise.resolve([]),
+        userId ? prisma.$queryRaw`SELECT username FROM "User" WHERE id = ${userId}` as Promise<any[]> : Promise.resolve([])
+    ]);
+
     const dbName = userRec[0]?.username;
     const currentUserName = (dbName && !dbName.startsWith('user_')) ? dbName : 'Yo';
 

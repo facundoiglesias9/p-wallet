@@ -5,8 +5,11 @@ import { getCategories } from '@/actions/expenses';
 import { Target, Sparkles } from 'lucide-react';
 
 export default async function PlansPage() {
-    const plans = await getPlans();
-    const categories = await getCategories();
+    // Parallel fetch for speed
+    const [plans, categories] = await Promise.all([
+        getPlans(),
+        getCategories()
+    ]);
 
     const totalEstimated = plans.reduce((sum, p) => sum + p.amount, 0);
 

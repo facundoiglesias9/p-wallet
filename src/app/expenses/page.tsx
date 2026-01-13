@@ -16,12 +16,14 @@ export default async function ExpensesPage() {
     // Usamos las cookies para persistir el filtro
     const { month, year } = await getDateFilter();
 
-    const expensesRaw = await getExpenses(month, year);
-    const categories = await getCategories();
-    // Use the robust getPeople action which handles potential client generation issues
-    const people = await getPeople();
+    // Fetch everything in parallel for maximum speed
+    const [expensesRaw, categories, people, session] = await Promise.all([
+        getExpenses(month, year),
+        getCategories(),
+        getPeople(),
+        (await import('@/lib/session')).verifySession()
+    ]);
 
-    const session = await (await import('@/lib/session')).verifySession();
     const userId = session?.userId as string;
     const userRec = userId ? await prisma.$queryRaw`SELECT username FROM "User" WHERE id = ${userId}` as any[] : []; // Added quotes for Postgres safety
     const dbName = userRec[0]?.username;

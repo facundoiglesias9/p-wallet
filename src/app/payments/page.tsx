@@ -11,10 +11,13 @@ export default async function PaymentsPage() {
     // Cookie based filter
     const { month, year } = await getDateFilter();
 
-    const expensesRaw = await getExpenses(month, year);
-    const categoriesDb = await getCategories();
+    // Parallel fetch
+    const [expensesRaw, categoriesDb, session] = await Promise.all([
+        getExpenses(month, year),
+        getCategories(),
+        verifySession()
+    ]);
 
-    const session = await verifySession();
     const userId = session?.userId as string;
 
     // Fetch Payment Status for all categories in this month

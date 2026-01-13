@@ -9,32 +9,29 @@ import { getDateFilter } from '@/actions/app-settings';
 import { InstallPWA } from '@/components/ui/InstallPWA';
 
 export default async function Dashboard() {
-  // Obtener fecha desde cookies
-  const { month: selectedMonth, year: selectedYear } = await getDateFilter();
+  // Fetch real data in PARALLEL for maximum speed
+  const [session, { month: selectedMonth, year: selectedYear }] = await Promise.all([
+    verifySession(),
+    getDateFilter()
+  ]);
 
+  const userId = session?.userId as string;
   const startOfMonth = new Date(selectedYear, selectedMonth, 1);
   const endOfMonth = new Date(selectedYear, selectedMonth + 1, 0);
 
-  // Fetch real data filtered by current range
-  const session = await verifySession();
-  const userId = session?.userId as string;
+  // Execute secondary data fetching in parallel
+  const [expenses, incomes, people] = await Promise.all([
+    prisma.$queryRaw`
+      SELECT * FROM "Expense" 
+      WHERE "userId" = ${userId} 
+      AND date >= ${startOfMonth} 
+      AND date <= ${endOfMonth}
+    ` as Promise<any[]>,
+    getIncomes(selectedMonth + 1, selectedYear),
+    getPeople()
+  ]);
 
-  // Use raw query to bypass stale Prisma Client types
-  const expenses: any[] = await prisma.$queryRaw`
-    SELECT * FROM "Expense" 
-    WHERE "userId" = ${userId} 
-    AND date >= ${startOfMonth} 
-    AND date <= ${endOfMonth}
-  `;
-
-  /* Total Incomes Calculation using shared Recurring Logic */
-  const incomes = await getIncomes(selectedMonth + 1, selectedYear);
   const totalIncome = incomes.reduce((sum: any, i: any) => sum + i.amount, 0);
-
-  // Get count of people involved in general shared expenses.
-  // Initially we assume ALL people participate in shared expenses unless we complicate the schema further.
-  // Get count of people involved in general shared expenses.
-  const people = await getPeople();
   const participantCount = people.length + 1; // Me + Others
 
   const totalSpent = expenses.reduce((sum: number, e: any) => {
