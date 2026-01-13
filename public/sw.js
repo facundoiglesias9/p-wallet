@@ -1,5 +1,4 @@
-// Minimal Service Worker for PWA compliance
-self.addEventListener('install', () => {
+self.addEventListener('install', (event) => {
     self.skipWaiting();
 });
 
@@ -7,7 +6,13 @@ self.addEventListener('activate', (event) => {
     event.waitUntil(clients.claim());
 });
 
-// We don't fetch anything to avoid interfering with auth or external scripts
-self.addEventListener('fetch', () => {
-    // Do nothing, let the browser handle it
+self.addEventListener('fetch', (event) => {
+    // Required for PWA to be installable: respondWith must be called
+    event.respondWith(
+        fetch(event.request).catch(() => {
+            // Fallback or just let it fail if offline, 
+            // but the call to respondWith is what triggers the PWA criteria
+            return new Response("Offline");
+        })
+    );
 });
