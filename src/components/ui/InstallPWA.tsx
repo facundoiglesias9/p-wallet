@@ -73,6 +73,28 @@ export function InstallPWA() {
 
     return (
         <>
+            {/* Visual Debugger for PWA - Only visible during troubleshooting */}
+            <div style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                zIndex: 100000,
+                background: 'rgba(0,0,0,0.8)',
+                color: '#fff',
+                fontSize: '10px',
+                padding: '10px',
+                pointerEvents: 'none',
+                maxWidth: '60vw',
+                fontFamily: 'monospace'
+            }}>
+                PWA DEBUG:<br />
+                NativePrompt: {canInstallNative ? 'SI' : 'NO'}<br />
+                Deferred: {deferredPrompt ? 'OK' : 'NULL'}<br />
+                InApp: {isInAppBrowser ? 'SI' : 'NO'}<br />
+                Standalone: {isStandalone ? 'SI' : 'NO'}<br />
+                SW: {('serviceWorker' in navigator) ? 'SUPPORTED' : 'NO'}
+            </div>
+
             <button
                 onClick={handleInstallClick}
                 style={{
