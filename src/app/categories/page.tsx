@@ -9,19 +9,14 @@ export default async function CategoriesPage() {
         <div className="animate-ready" style={{ maxWidth: '1000px', margin: '0 auto', paddingBottom: '4rem' }}>
 
             {/* Header */}
-            <header style={{ marginBottom: '3rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1.5rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div className="icon-box" style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-main)' }}>
-                        <Layers size={28} />
-                    </div>
-                    <div>
-                        <h1 className="title-metallic-category" style={{ fontSize: '2.5rem', margin: 0, lineHeight: 1.2 }}>
-                            Categorías
-                        </h1>
-                        <p style={{ color: 'var(--text-dim)', marginTop: '0.25rem' }}>
-                            Gestiona tus etiquetas de gastos
-                        </p>
-                    </div>
+            <header style={{ marginBottom: '3rem', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '1rem' }}>
+                <div>
+                    <h1 className="title-metallic-category" style={{ fontSize: '2.5rem', margin: 0, lineHeight: 1.2 }}>
+                        Categorías
+                    </h1>
+                    <p style={{ color: 'var(--text-dim)', marginTop: '0.25rem' }}>
+                        Gestiona tus etiquetas de gastos
+                    </p>
                 </div>
             </header>
 

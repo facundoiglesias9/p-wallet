@@ -232,8 +232,12 @@ export async function updateCategory(formData: FormData) {
 }
 
 export async function deleteCategory(id: string) {
-    // Optional: Check if used in expenses and handle accordingly (block or cascade null)
-    // For now, simple delete. Prisma might throw if restricted, but usually we handle foreign keys.
+    // First delete all linked category payments to avoid foreign key errors
+    await prisma.categoryPayment.deleteMany({
+        where: { categoryId: id }
+    });
+
+    // Then delete the category itself
     await prisma.category.delete({
         where: { id }
     });

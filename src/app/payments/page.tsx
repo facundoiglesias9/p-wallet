@@ -66,7 +66,7 @@ export default async function PaymentsPage() {
     return (
         <div className="animate-ready" style={{ maxWidth: '800px', margin: '0 auto', paddingBottom: '4rem' }}>
             <header style={{ marginBottom: '3rem', textAlign: 'center' }}>
-                <h1 className="title-metallic-income" style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>
+                <h1 className="title-metallic" style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>
                     Pagos Mensuales
                 </h1>
                 <p style={{ color: 'var(--text-dim)' }}>

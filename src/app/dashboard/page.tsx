@@ -76,23 +76,22 @@ export default async function Dashboard() {
   return (
     <div className="animate-ready">
       <header style={{
-        marginBottom: '3rem',
+        marginBottom: '2.5rem',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: '2rem',
-        position: 'relative' // Needed for absolute positioning if we wanted, but flex is better
+        gap: '1.5rem',
+        width: '100%'
       }}>
-        {/* PWA Install Button Helper */}
-        <div style={{ position: 'absolute', top: 0, right: 0 }}>
+        <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginBottom: '-0.5rem' }}>
           <InstallPWA />
         </div>
 
         <div style={{ textAlign: 'center' }}>
-          <h1 className="title-metallic-dashboard">
+          <h1 className="title-metallic-dashboard" style={{ lineHeight: 1.1 }}>
             Resumen Mensual
           </h1>
-          <p style={{ color: 'var(--text-dim)', fontSize: '1.1rem', fontWeight: 500, marginTop: '0.5rem' }}>
+          <p style={{ color: 'var(--text-dim)', fontSize: '1rem', fontWeight: 500, marginTop: '0.25rem' }}>
             Tu salud financiera de un vistazo.
           </p>
         </div>
@@ -103,24 +102,24 @@ export default async function Dashboard() {
 
       <section className="stats-grid">
         {stats.map((stat, i) => (
-          <div key={i} className="stat-card">
-            <div style={{ color: stat.color, marginBottom: '1.5rem', transform: 'scale(1.2)', display: 'inline-block' }}>
+          <div key={i} className="stat-card" style={{ padding: '1.5rem' }}>
+            <div style={{ color: stat.color, marginBottom: '1rem', transform: 'scale(1.1)', display: 'inline-block' }}>
               {stat.icon}
             </div>
             <span className="stat-label">{stat.label}</span>
-            <div className="stat-value">{stat.value}</div>
+            <div className="stat-value" style={{ fontSize: '2rem' }}>{stat.value}</div>
           </div>
         ))}
       </section>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '2rem' }}>
+      <div className="dashboard-grid">
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           {/* Category Breakdown */}
           <section className="section-card">
             <div className="section-header">
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                 <PieChart size={24} color="var(--primary)" />
-                <h2 style={{ fontSize: '1.5rem', fontWeight: 700 }}>Gastos por Categoría</h2>
+                <h2 style={{ fontSize: '1.5rem', fontWeight: 700 }}>Categorías</h2>
               </div>
             </div>
 
@@ -146,21 +145,21 @@ export default async function Dashboard() {
           {/* Recurrent & Installments Info */}
           <section className="section-card">
             <div className="section-header">
-              <h2 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Pagos Fijos del Mes</h2>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Pagos Fijos</h2>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1rem' }}>
               {importantPayments.length === 0 ? (
-                <p style={{ color: 'var(--text-dim)', gridColumn: 'span 2', textAlign: 'center' }}>No hay pagos fijos registrados.</p>
+                <p style={{ color: 'var(--text-dim)', textAlign: 'center' }}>No hay pagos fijos.</p>
               ) : (
                 importantPayments.map((pay: any, i: any) => (
                   <div key={i} style={{ background: 'var(--bg-card-hover)', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                      <span style={{ fontSize: '0.75rem', color: pay.type === 'subscription' ? 'var(--primary)' : 'var(--warning)', fontWeight: 700, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <span style={{ fontSize: '0.7rem', color: pay.type === 'subscription' ? 'var(--primary)' : 'var(--warning)', fontWeight: 700, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '4px' }}>
                         {pay.icon} {pay.type}
                       </span>
-                      <span style={{ fontWeight: 700 }}>{pay.amount}</span>
+                      <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{pay.amount}</span>
                     </div>
-                    <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>{pay.name}</div>
+                    <div style={{ fontWeight: 600, fontSize: '0.85rem' }}>{pay.name}</div>
                   </div>
                 ))
               )}
