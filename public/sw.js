@@ -1,12 +1,35 @@
+const CACHE_NAME = 'p-wallet-v1';
+const ASSETS = [
+    '/',
+    '/manifest.json',
+    '/icon-192.png',
+    '/icon-512.png'
+];
+
 self.addEventListener('install', (event) => {
+    event.waitUntil(
+        caches.open(CACHE_NAME).then((cache) => {
+            return cache.addAll(ASSETS);
+        })
+    );
     self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
-    event.waitUntil(clients.claim());
+    event.waitUntil(
+        caches.keys().then((keys) => {
+            return Promise.all(
+                keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
+            );
+        })
+    );
+    self.skipWaiting();
 });
 
 self.addEventListener('fetch', (event) => {
-    // Solo necesitamos que exista el service worker para cumplir los criterios de PWA
-    event.respondWith(fetch(event.request));
+    event.respondWith(
+        fetch(event.request).catch(() => {
+            return caches.match(event.request);
+        })
+    );
 });

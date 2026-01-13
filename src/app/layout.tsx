@@ -43,6 +43,12 @@ export default function RootLayout({
                     });
                   });
                 }
+                
+                // Capture deferred prompt for PWA
+                window.addEventListener('beforeinstallprompt', (e) => {
+                  e.preventDefault();
+                  window.deferredPrompt = e;
+                });
               `,
             }}
           />

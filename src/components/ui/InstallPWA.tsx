@@ -20,10 +20,17 @@ export function InstallPWA() {
         // Detect if already installed
         setIsStandalone(window.matchMedia('(display-mode: standalone)').matches);
 
+        // Initial check for globally captured prompt
+        if ((window as any).deferredPrompt) {
+            setDeferredPrompt((window as any).deferredPrompt);
+            setCanInstallNative(true);
+        }
+
         // Listen for the native install prompt (Android/Chrome)
         const handleBeforeInstallPrompt = (e: any) => {
             e.preventDefault();
             setDeferredPrompt(e);
+            (window as any).deferredPrompt = e;
             setCanInstallNative(true);
         };
 
@@ -34,14 +41,20 @@ export function InstallPWA() {
         };
     }, []);
 
-    const handleInstallClick = async () => {
-        if (canInstallNative && deferredPrompt) {
+    const handleInstallClick = async (e?: React.MouseEvent) => {
+        if (e) e.stopPropagation();
+
+        const promptToUse = deferredPrompt || (window as any).deferredPrompt;
+
+        if (canInstallNative && promptToUse) {
             // Native prompt for Android/Windows/Chrome
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
+            promptToUse.prompt();
+            const { outcome } = await promptToUse.userChoice;
             if (outcome === 'accepted') {
                 setCanInstallNative(false);
                 setDeferredPrompt(null);
+                (window as any).deferredPrompt = null;
+                setShowModal(false);
             }
         } else {
             // Show instructions for iOS or if prompt is not available
@@ -162,23 +175,30 @@ export function InstallPWA() {
                             </div>
                         ) : (
                             <div style={{ padding: '1.5rem', background: 'rgba(255,255,255,0.03)', borderRadius: '24px', border: '1px dashed rgba(255,255,255,0.1)' }}>
-                                <p style={{ color: 'var(--text-dim)', marginBottom: '1rem', fontSize: '0.95rem' }}>
-                                    Abre el menú de tu navegador y selecciona:
+                                <p style={{ color: 'var(--text-dim)', marginBottom: '1.5rem', fontSize: '0.95rem' }}>
+                                    Navegador detectado: Android. Toque el botón de abajo o use el menú del navegador.
                                 </p>
-                                <div style={{
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: '0.75rem',
-                                    background: 'var(--primary)',
-                                    padding: '0.75rem 1.25rem',
-                                    borderRadius: '12px',
-                                    fontWeight: 700,
-                                    color: 'white',
-                                    boxShadow: '0 10px 20px rgba(99, 102, 241, 0.3)'
-                                }}>
+                                <button
+                                    onClick={handleInstallClick}
+                                    style={{
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '0.75rem',
+                                        background: 'var(--primary)',
+                                        padding: '0.85rem 1.5rem',
+                                        borderRadius: '14px',
+                                        fontWeight: 700,
+                                        color: 'white',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        boxShadow: '0 10px 20px rgba(99, 102, 241, 0.3)',
+                                        transition: '0.2s'
+                                    }}
+                                    className="active:scale-95"
+                                >
                                     <Smartphone size={20} />
                                     Instalar aplicación
-                                </div>
+                                </button>
                             </div>
                         )}
                     </div>
